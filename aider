@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+set -e
+
+cd "$(dirname "$0")"
+
+mkdir -p workspace
+
+trap 'docker rm -f "aider_${USER}"' EXIT
+docker build -t aider .
+docker run --rm -d -u "$(id -u):$(id -g)" -v "${PWD}/workspace:/workspace" --name "aider_${USER}" aider
+docker exec -u root "aider_${USER}" adduser -d /workspace -M -u "$(id -u)" "${USER}"
+docker exec "aider_${USER}" pip install --user aider-chat
+printf '\n'
+docker exec "aider_${USER}" bash -c 'printf "Node version:" && node -v && python --version && aider --version'
+printf '\n'
+docker exec -ti "aider_${USER}" bash
