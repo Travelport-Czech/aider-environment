@@ -1,6 +1,7 @@
 FROM amazonlinux:2023
 
 RUN dnf install -y \
+     binutils \
      git \
      gzip \
      nodejs \
