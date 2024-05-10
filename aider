@@ -6,13 +6,16 @@ cd "$(dirname "$0")"
 
 mkdir -p workspace
 
-if ! [[ -f open_api.key ]]; then
+OPENAI_API_KEY_FILE="${PWD}/openai_api.key"
+
+if ! [[ -f "${OPENAI_API_KEY_FILE}" ]]; then
   read -r -p 'Enter openai api key (https://platform.openai.com/api-keys): ' OPENAI_API_KEY
-  printf '%s\n' "${OPENAI_API_KEY}" > open_api.key
-  chmod 600 open_api.key
+  touch "${OPENAI_API_KEY_FILE}"
+  chmod 600 "${OPENAI_API_KEY_FILE}"
+  printf '%s\n' "${OPENAI_API_KEY}" > "${OPENAI_API_KEY_FILE}"
 fi
 
-read -r OPENAI_API_KEY < open_api.key
+read -r OPENAI_API_KEY < "${OPENAI_API_KEY_FILE}"
 export OPENAI_API_KEY
 trap 'docker rm -f "aider_${USER}"' EXIT
 docker build -t aider .
@@ -21,5 +24,6 @@ docker exec -u root "aider_${USER}" adduser -d /workspace -M -u "$(id -u)" "${US
 docker exec "aider_${USER}" pip install --user aider-chat
 printf '\n'
 docker exec "aider_${USER}" bash -c 'printf "Node version:" && node -v && python --version && aider --version'
+printf 'Openai api key is stored in "%s"\n' "${OPENAI_API_KEY_FILE}"
 printf '\n'
 docker exec -ti "aider_${USER}" bash
