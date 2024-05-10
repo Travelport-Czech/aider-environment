@@ -28,3 +28,11 @@ This script do:
  - start container `aider_${USER}` with persistent storage in folder `workspace`
 
 After script end is container `aider_${USER}` removed, but image `aider` and data in `workspace` remain for next faster start.
+
+## next console
+
+You can connect to running aider container from other console by command:
+
+```bash
+$ docker exec -it aider_${USER} bash
+```
