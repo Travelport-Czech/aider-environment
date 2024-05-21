@@ -17,13 +17,17 @@ fi
 
 read -r OPENAI_API_KEY < "${OPENAI_API_KEY_FILE}"
 export OPENAI_API_KEY
-trap 'docker rm -f "aider_${USER}"' EXIT
-docker build -t aider .
-docker run --rm -d -u "$(id -u):$(id -g)" -e OPENAI_API_KEY -v "${PWD}/workspace:/workspace" --name "aider_${USER}" aider
-docker exec -u root "aider_${USER}" adduser -d /workspace -M -u "$(id -u)" "${USER}"
-docker exec "aider_${USER}" pip install --user aider-chat
+trap 'docker rm -f "aider_golin_${USER}"' EXIT
+docker build -t aider_golin .
+docker run --rm -d -u "$(id -u):$(id -g)" -e OPENAI_API_KEY -v "${PWD}/workspace:/workspace" --name "aider_golin_${USER}" aider_golin
+docker exec -u root "aider_golin_${USER}" adduser -D -h /workspace -H -u "$(id -u)" "${USER}"
 printf '\n'
-docker exec "aider_${USER}" bash -c 'printf "Node version:" && node -v && python --version && aider --version'
+docker exec "aider_golin_${USER}" bash -c 'python --version && aider --version'
+docker exec "aider_golin_${USER}" git config --global user.name "$(git config --global user.name)"
+docker exec "aider_golin_${USER}" git config --global user.email "$(git config --global user.email)"
+printf 'Git configuration:\n'
+docker exec "aider_golin_${USER}" git config --global user.name
+docker exec "aider_golin_${USER}" git config --global user.email
 printf 'Openai api key is stored in "%s"\n' "${OPENAI_API_KEY_FILE}"
 printf '\n'
-docker exec -ti "aider_${USER}" bash
+docker exec -ti "aider_golin_${USER}" bash

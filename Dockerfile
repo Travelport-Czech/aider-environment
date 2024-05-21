@@ -1,19 +1,17 @@
-FROM amazonlinux:2023
+FROM alpine
 
-RUN dnf install -y \
-     binutils \
-     git \
-     gzip \
-     nodejs \
-     npm \
-     python3-pip \
-     shadow-utils \
-     tar \
-     vim \
-     xz \
-   && dnf clean all \
-   && ln -s /usr/bin/python3 /usr/bin/python \
-   && npm install -g pnpm
+RUN set -x \
+      && apk add --no-cache \
+      bash \
+      python3 \
+      py3-pip \
+      git
+
+RUN python3 -m venv /venv
+ENV PATH="/venv/bin:$PATH"
+
+RUN /venv/bin/pip install --upgrade pip
+RUN /venv/bin/pip install --upgrade aider-chat
 
 WORKDIR /workspace
 ENV HOME=/workspace
